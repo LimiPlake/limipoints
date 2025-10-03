@@ -4,9 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>LimiPlake PIN Picker</title>
+
+<!-- PWA manifest + theme -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#14b393">
 <link rel="icon" href="icon.png">
+
 <style>
   :root{--bg:#f0fbff;--card:#fff;--accent:#14b393;--muted:#666;}
   body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
@@ -178,6 +181,7 @@ function spin(){
   const winner=pins[winnerIndex];
   const digits=winner.split('').map(d=>+d);
   const durations=[2000,2500,3000,3500];const start=performance.now();
+
   function tick(now){
     const elapsed=now-start;
     rngs.forEach((r,i)=>{
@@ -187,13 +191,17 @@ function spin(){
       } else {r.value=digits[i];setVisual(i,digits[i]);}
     });
     if(elapsed<Math.max(...durations))requestAnimationFrame(tick);
-    else{setTimeout(()=>{
-      launchConfetti();
-      modalWinner.textContent = winner; // only numbers, no shapes
-      modal.style.display='flex';
-      classes[key]=pins.filter((_,i)=>i!==winnerIndex);
-      populate();spinBtn.disabled=false;
-    },400);}
+    else{
+      setTimeout(()=>{
+        launchConfetti();
+        modalWinner.textContent = winner; // only numbers in popup
+        modal.style.display='flex';
+        // REMOVE WINNER
+        classes[key]=pins.filter((_,i)=>i!==winnerIndex);
+        populate(); // refresh + save
+        spinBtn.disabled=false;
+      },400);
+    }
   }
   requestAnimationFrame(tick);
 }
@@ -219,8 +227,8 @@ populate();
 // register service worker
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js")
-    .then(() => console.log("Service Worker registered"))
-    .catch(err => console.error("SW registration failed", err));
+    .then(()=>console.log("Service Worker registered"))
+    .catch(err=>console.error("SW registration failed",err));
 }
 </script>
 </body>
