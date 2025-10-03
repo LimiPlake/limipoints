@@ -1,10 +1,19 @@
-Copyright (c) 2025 by LimiPlake
+Copyright (c) [YEAR] [ORGANIZATION]
 
 Limisoft License v-1.0.0
+------------------------
 
-Duplicates of the Software must be permitted by the Owner and with a different link. The Software can be used only in this organization. By
-using the Software I agree to all these terms.
+1. Use inside this Organization
+   This Software may be used, modified, and shared only within this Organization.
+
+2. Forks / Duplicates
+   Creating or maintaining a duplicate of this Software (including forks or repositories
+   in another Organization) requires explicit permission from the Owner.
+   If permitted, the duplicate must be hosted under a different link provided by the Owner.
+
+3. Agreement
+   By using the Software, you agree to the terms of this License.
 
 
 _____________________________
-      Sig. if printed
+   Signature (if printed)
