@@ -18,7 +18,9 @@
   button.secondary{background:#e6eef0;color:#123}
   .digit-sliders{display:flex;gap:12px;justify-content:center;margin:16px 0}
   .digit-wrap{display:flex;flex-direction:column;align-items:center;width:70px}
-  .big-value{font-weight:700;font-size:1.4rem;margin:6px 0}
+  .big-value{font-weight:700;font-size:1.4rem;margin:4px 0;text-align:center;line-height:1.2}
+  .num{font-size:1.2rem;font-weight:600}
+  .shape{font-size:1.6rem;display:block}
   input[type=range]{-webkit-appearance:none;width:100%;height:160px;writing-mode:bt-lr;
     transform:rotate(270deg);margin:20px 0;background:linear-gradient(90deg,#14b393,#6fd1c3);
     border-radius:10px;outline:none}
@@ -38,7 +40,7 @@
         <select id="classSelect" style="flex:1"></select>
         <button id="addClassBtn">+ Add Class</button>
       </div>
-      <label style="margin-top:8px">Edit PINs (one per line, 4 digits each)</label>
+      <label style="margin-top:8px">Edit PINs (digits 1–4, 4 long)</label>
       <textarea id="pinsArea" placeholder="1234"></textarea>
       <div style="margin-top:6px;display:flex;gap:8px">
         <button id="savePins">Save</button>
@@ -51,10 +53,10 @@
       <select id="classForSpin"></select>
 
       <div class="digit-sliders">
-        <div class="digit-wrap"><div class="big-value" id="vis0">-</div><input type="range" id="rng0" min="0" max="9" value="0"></div>
-        <div class="digit-wrap"><div class="big-value" id="vis1">-</div><input type="range" id="rng1" min="0" max="9" value="0"></div>
-        <div class="digit-wrap"><div class="big-value" id="vis2">-</div><input type="range" id="rng2" min="0" max="9" value="0"></div>
-        <div class="digit-wrap"><div class="big-value" id="vis3">-</div><input type="range" id="rng3" min="0" max="9" value="0"></div>
+        <div class="digit-wrap"><div class="big-value" id="vis0"><span class="num">-</span><span class="shape"></span></div><input type="range" id="rng0" min="1" max="4" value="1"></div>
+        <div class="digit-wrap"><div class="big-value" id="vis1"><span class="num">-</span><span class="shape"></span></div><input type="range" id="rng1" min="1" max="4" value="1"></div>
+        <div class="digit-wrap"><div class="big-value" id="vis2"><span class="num">-</span><span class="shape"></span></div><input type="range" id="rng2" min="1" max="4" value="1"></div>
+        <div class="digit-wrap"><div class="big-value" id="vis3"><span class="num">-</span><span class="shape"></span></div><input type="range" id="rng3" min="1" max="4" value="1"></div>
       </div>
 
       <div style="text-align:center;">
@@ -68,14 +70,21 @@
   <div id="modal" class="modal">
     <div class="dlg">
       <h2>A LimiPoint to...</h2>
-      <div id="modalWinner" style="font-size:1.8rem;font-weight:700;margin:10px 0"></div>
+      <div id="modalWinner" style="font-size:1.6rem;font-weight:700;margin:10px 0"></div>
       <button id="closeModal">Close</button>
     </div>
   </div>
   <canvas id="confetti" class="confetti-canvas"></canvas>
 
 <script>
-// --- Data ---
+// shape map
+const shapes = {
+  1: "⚪", // circle
+  2: "⬛", // square
+  3: "◆", // rhombus
+  4: "▲"  // triangle
+};
+
 const classes={};
 const classSelect=document.getElementById('classSelect');
 const classForSpin=document.getElementById('classForSpin');
@@ -90,6 +99,12 @@ const modal=document.getElementById('modal'),modalWinner=document.getElementById
 document.getElementById('closeModal').onclick=()=>modal.style.display='none';
 const confettiCanvas=document.getElementById('confetti'),confettiCtx=confettiCanvas.getContext('2d');
 confettiCanvas.width=innerWidth;confettiCanvas.height=innerHeight;
+
+// update number + shape display
+function setVisual(vis,val){
+  vis.querySelector(".num").textContent=val;
+  vis.querySelector(".shape").textContent=shapes[val];
+}
 
 // populate dropdowns
 function populate(){
@@ -132,7 +147,7 @@ savePins.onclick=()=>{
 // reset pins
 resetPins.onclick=()=>{
   const key=classSelect.value;
-  classes[key]=["0000","1111","2222"];
+  classes[key]=["1234","2341","3412"];
   populate();
 };
 
@@ -153,18 +168,19 @@ function spin(){
     const elapsed=now-start;
     rngs.forEach((r,i)=>{
       if(elapsed<durations[i]){
-        r.value=(+r.value+1)%10;
-        visuals[i].textContent=r.value;
+        let val=(+r.value%4)+1;
+        r.value=val;
+        setVisual(visuals[i],val);
       } else {
         r.value=digits[i];
-        visuals[i].textContent=digits[i];
+        setVisual(visuals[i],digits[i]);
       }
     });
     if(elapsed<Math.max(...durations)) requestAnimationFrame(tick);
     else {
       setTimeout(()=>{
         launchConfetti();
-        modalWinner.textContent=winner;
+        modalWinner.textContent=winner.split('').map(d=>`${d}${shapes[d]}`).join(" ");
         modal.style.display='flex';
         classes[key]=pins.filter((_,i)=>i!==winnerIndex);
         populate();
