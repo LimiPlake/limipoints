@@ -186,7 +186,7 @@ function spin(){
     if(elapsed<Math.max(...durations))requestAnimationFrame(tick);
     else{setTimeout(()=>{
       launchConfetti();
-      modalWinner.textContent=winner.split('').map(d=>`${d}${shapes[d]}`).join(" ");
+      modalWinner.textContent = winner; // only numbers, no shapes
       modal.style.display='flex';
       classes[key]=pins.filter((_,i)=>i!==winnerIndex);
       populate();spinBtn.disabled=false;
